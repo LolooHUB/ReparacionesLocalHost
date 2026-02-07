@@ -19,7 +19,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- ANIMACIONES (Sin Loops) --- */
+/* --- ANIMACIONES --- */
 .fade-in-inicio { animation: fadeIn 1s ease-out forwards; }
 .fade-in-sistema { animation: fadeIn 2.5s ease-out forwards; }
 
@@ -28,16 +28,15 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Pantalla de Inicio */
+.container { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+/* Pantalla de Bienvenida */
 .welcome-screen {
   height: 100vh; display: flex; flex-direction: column;
   align-items: center; justify-content: center; text-align: center;
 }
 .clock { font-size: 5rem; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(59, 130, 246, 0.4); margin: 10px 0; }
 .date-display { font-size: 1.2rem; color: var(--accent); margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
-
-/* Contenedor y Nav */
-.container { max-width: 800px; margin: 0 auto; padding: 20px; }
 
 nav {
   display: flex; gap: 10px; margin-bottom: 30px;
@@ -52,21 +51,18 @@ nav {
 }
 .nav-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
 
-/* --- TUS CARDS ORIGINALES --- */
+/* Cards Originales */
 .card {
   background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border);
   padding: 25px; border-radius: 24px; margin-bottom: 20px;
-  /* Animación de entrada única para cada card */
-  animation: fadeIn 0.4s ease-out forwards; 
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 h2 { color: var(--accent); margin-top: 0; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
-.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
 
-/* --- TUS INPUTS ORIGINALES --- */
 input, textarea, select {
   background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border);
-  color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; font-size: 1rem;
+  color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px;
 }
 input:focus, textarea:focus { outline: 1px solid var(--primary); }
 
@@ -75,25 +71,22 @@ input:focus, textarea:focus { outline: 1px solid var(--primary); }
   border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s;
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn-action:hover { background: #2563eb; transform: scale(1.02); }
+.btn-action:hover { background: #2563eb; transform: scale(1.01); }
 
-/* --- ESTADOS VACÍOS (CAFÉ) --- */
+/* Bitácora */
+.log-box { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 18px; border-left: 4px solid var(--primary); }
+.log-sub { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.log-sub:last-child { border: none; margin-bottom: 0; }
+.log-sub label { font-size: 0.65rem; text-transform: uppercase; color: var(--accent); display: block; font-weight: 800; margin-bottom: 4px; }
+.log-sub p { margin: 0; font-size: 0.9rem; color: #cbd5e1; }
+
 .empty-state {
   text-align: center; padding: 50px 20px; background: rgba(30, 41, 59, 0.3);
   border: 2px dashed rgba(255, 255, 255, 0.05); border-radius: 24px; color: #64748b;
 }
-.empty-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
 
-/* --- BITÁCORA INTEGRADA --- */
-.log-box { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 18px; border-left: 4px solid var(--primary); }
-.log-sub { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.log-sub label { font-size: 0.65rem; text-transform: uppercase; color: var(--accent); display: block; font-weight: 800; }
-.log-sub p { margin: 0; font-size: 0.9rem; color: #cbd5e1; }
-
-/* --- STATS EN CAJA --- */
 .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 30px; }
 .stat-box { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(59, 130, 246, 0.2); }
-.stat-box small { font-size: 0.6rem; color: var(--accent); display: block; }
 
 footer { text-align: center; margin-top: 50px; padding: 30px; border-top: 1px solid var(--border); color: #64748b; font-size: 0.8rem; }
 footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
