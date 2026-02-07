@@ -12,9 +12,6 @@ function App() {
   const [search, setSearch] = useState("");
   const [historialId, setHistorialId] = useState(null);
 
-  // Datos para Facturador
-  const eConf = { nom: "TecnoService", cuit: "20334445551", pago: "MI.ALIAS.PAGO" };
-
   useEffect(() => {
     const timer = setInterval(() => setTiempo(new Date()), 1000);
     return () => clearInterval(timer);
@@ -31,7 +28,7 @@ function App() {
   const entregadosCount = lista.filter(r => r.pagado).length;
 
   const agregarItem = (r) => {
-    const desc = prompt("🛠️ Descripción del trabajo/repuesto:");
+    const desc = prompt("🛠️ Descripción del item:");
     const precio = prompt("💰 Precio ($):");
     if (desc && precio) {
       const nuevosArt = [...(r.articulos || []), { desc, precio: Number(precio) }];
@@ -51,15 +48,9 @@ function App() {
         <div className="log-sub">
           <label>🛠️ Taller</label>
           {r.articulos.map((a, i) => (
-            <p key={i}>• {a.desc}: <strong>${a.precio}</strong></p>
+            <p key={i} style={{fontSize:'0.85rem', margin:'3px 0'}}>• {a.desc}: <strong>${a.precio}</strong></p>
           ))}
           <p style={{marginTop:'5px', borderTop:'1px solid rgba(255,255,255,0.1)', paddingTop:'5px'}}>Total: <strong>${r.precio}</strong></p>
-        </div>
-      )}
-      {r.pagado && (
-        <div className="log-sub">
-          <label>💰 Caja</label>
-          <p>✅ Pagado ({r.metodoPago})</p>
         </div>
       )}
     </div>
@@ -105,58 +96,49 @@ function App() {
       {seccion === 'B' && (
         <section>
           <h2>🛠️ Gestión de Taller</h2>
-          {lista.filter(r => r.estado !== 'Terminado' && r.estado !== 'Entregado').length > 0 ? (
-            lista.filter(r => r.estado !== 'Terminado' && r.estado !== 'Entregado').map(r => (
-              <div key={r.fid} className="card">
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                  <strong>📱 {r.equipo} (ID: #{r.idTicket})</strong>
-                  <button className="nav-btn active" style={{flex:'none', padding:'8px 15px'}} onClick={() => setSelectedId(selectedId === r.fid ? null : r.fid)}>
-                    {selectedId === r.fid ? "✖️ CERRAR" : "⚙️ ELEGIR"}
+          {lista.filter(r => r.estado !== 'Terminado' && r.estado !== 'Entregado').map(r => (
+            <div key={r.fid} className="card">
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                <strong>📱 {r.equipo} (ID: #{r.idTicket})</strong>
+                <button className="nav-btn active" style={{flex:'none', padding:'8px 15px'}} onClick={() => setSelectedId(selectedId === r.fid ? null : r.fid)}>
+                  {selectedId === r.fid ? "✖️ CERRAR" : "⚙️ ELEGIR"}
+                </button>
+              </div>
+              {selectedId === r.fid && (
+                <div style={{marginTop:'15px'}}>
+                  <Bitacora r={r} />
+                  <button className="btn-action" style={{margin:'10px 0', background:'rgba(255,255,255,0.1)'}} onClick={() => agregarItem(r)}>➕ ITEM</button>
+                  <button className={`btn-action ${r.articulos?.length > 0 ? 'btn-ready' : ''}`} disabled={!r.articulos?.length} onClick={() => {actualizarReparacion(r.fid, { estado: 'Terminado' }); setSelectedId(null);}}>
+                    ✅ TERMINAR
                   </button>
                 </div>
-                {selectedId === r.fid && (
-                  <div className="fade-in-sistema" style={{marginTop:'15px'}}>
-                    <Bitacora r={r} />
-                    <button className="btn-action" style={{margin:'10px 0', background:'rgba(255,255,255,0.1)'}} onClick={() => agregarItem(r)}>➕ AGREGAR TRABAJO</button>
-                    <button 
-                      className={`btn-action ${r.articulos?.length > 0 ? 'btn-ready' : ''}`} 
-                      disabled={!r.articulos?.length} 
-                      onClick={() => {actualizarReparacion(r.fid, { estado: 'Terminado' }); setSelectedId(null);}}
-                    >
-                      ✅ MARCAR COMO LISTO
-                    </button>
-                    {!r.articulos?.length && <p style={{fontSize:'0.7rem', color:'#f87171', textAlign:'center', marginTop:'8px'}}>Carga al menos un ítem para terminar</p>}
-                  </div>
-                )}
-              </div>
-            ))
-          ) : <div className="empty-state"><span className="empty-icon">☕</span><p>Nada en taller.</p></div>}
+              )}
+            </div>
+          ))}
         </section>
       )}
 
       {seccion === 'C' && (
         <section>
           <h2>💰 Caja</h2>
-          {lista.filter(r => r.estado === 'Terminado' && !r.pagado).length > 0 ? (
-            lista.filter(r => r.estado === 'Terminado' && !r.pagado).map(r => (
-              <div key={r.fid} className="card">
-                <h3>👤 {r.cliente} - ${r.precio}</h3>
-                <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px'}}>
-                  <select id={`m-${r.fid}`}>
-                    <option value="Efectivo">💵 Efectivo</option>
-                    <option value="Transferencia">🏦 Transferencia</option>
-                    <option value="Tarjeta">💳 Tarjeta</option>
-                  </select>
-                  <button className="btn-action" onClick={() => {
-                    const met = document.getElementById(`m-${r.fid}`).value;
-                    actualizarReparacion(r.fid, { pagado: true, estado: 'Entregado', metodoPago: met });
-                  }}>💸 COBRAR</button>
-                </div>
+          {lista.filter(r => r.estado === 'Terminado' && !r.pagado).map(r => (
+            <div key={r.fid} className="card">
+              <h3>👤 {r.cliente} - ${r.precio}</h3>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px'}}>
+                <select id={`m-${r.fid}`}>
+                  <option value="Efectivo">💵 Efectivo</option>
+                  <option value="Transferencia">🏦 Transferencia</option>
+                  <option value="Tarjeta">💳 Tarjeta</option>
+                </select>
+                <button className="btn-action" onClick={() => {
+                  const met = document.getElementById(`m-${r.fid}`).value;
+                  actualizarReparacion(r.fid, { pagado: true, estado: 'Entregado', metodoPago: met });
+                }}>💸 COBRAR</button>
               </div>
-            ))
-          ) : <div className="empty-state"><span className="empty-icon">💸</span><p>Nada para cobrar.</p></div>}
+            </div>
+          ))}
           <div className="stats-grid">
-            <div className="stat-box"><small>RECAUDADO</small><strong>${totalCaja}</strong></div>
+            <div className="stat-box"><small>CAJA HOY</small><strong>${totalCaja}</strong></div>
             <div className="stat-box"><small>ENTREGADOS</small><strong>{entregadosCount}</strong></div>
           </div>
         </section>
