@@ -17,72 +17,79 @@ body {
   color: var(--text);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* Animaciones */
+/* Animaciones Globales */
 .fade-in-inicio { animation: fadeIn 1s ease-out forwards; }
-.fade-in-sistema { animation: fadeIn 2.5s ease-out forwards; }
+.fade-in-sistema { animation: fadeIn Sistema 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Efecto Cascada para Tarjetas */
+.stagger-card {
+  animation: slideIn 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Interacciones de Botones */
+.btn-action {
+  background: var(--primary); color: white; border: none; padding: 15px;
+  border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-action:hover { transform: scale(1.02) translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+.btn-action:active { transform: scale(0.98); }
 
 /* Pantalla de Inicio */
 .welcome-screen {
   height: 100vh; display: flex; flex-direction: column;
   align-items: center; justify-content: center; text-align: center;
 }
-.clock { font-size: 5rem; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(59, 130, 246, 0.4); margin: 10px 0; }
-.date-display { font-size: 1.2rem; color: var(--accent); margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
+.clock { font-size: 5.5rem; font-weight: 800; color: #fff; text-shadow: 0 0 30px rgba(59, 130, 246, 0.5); margin: 10px 0; }
 
-.container { max-width: 800px; margin: 0 auto; padding: 20px; }
-
+/* Navegación Animada */
 nav {
   display: flex; gap: 10px; margin-bottom: 30px;
   background: rgba(15, 23, 42, 0.9); padding: 10px; border-radius: 20px;
   backdrop-filter: blur(10px); border: 1px solid var(--border);
   position: sticky; top: 10px; z-index: 100;
 }
-
 .nav-btn {
   flex: 1; padding: 12px; border: none; border-radius: 12px;
-  background: transparent; color: #94a3b8; font-weight: 600; cursor: pointer; transition: 0.3s;
+  background: transparent; color: #94a3b8; font-weight: 600; cursor: pointer; transition: 0.4s;
 }
-.nav-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+.nav-btn.active { background: var(--primary); color: white; transform: translateY(-2px); }
 
 .card {
   background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border);
   padding: 25px; border-radius: 24px; margin-bottom: 20px;
+  transition: border 0.3s ease;
 }
+.card:hover { border-color: var(--primary); }
 
-/* Estados vacíos (El café) */
-.empty-state {
-  text-align: center; padding: 50px 20px; background: rgba(30, 41, 59, 0.3);
-  border: 2px dashed rgba(255, 255, 255, 0.05); border-radius: 24px; color: #64748b;
-}
-.empty-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
-
-/* Bitácora */
+/* Bitácora con Iconos */
 .log-box { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 18px; border-left: 4px solid var(--primary); }
-.log-sub { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.log-sub label { font-size: 0.65rem; text-transform: uppercase; color: var(--accent); display: block; font-weight: 800; }
-.log-sub p { margin: 0; font-size: 0.9rem; color: #cbd5e1; }
+.log-sub label { font-size: 0.7rem; color: var(--accent); display: flex; align-items: center; gap: 5px; font-weight: 800; }
 
-/* Estadísticas en Caja */
-.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 30px; }
-.stat-box { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(59, 130, 246, 0.2); }
-.stat-box small { font-size: 0.6rem; color: var(--accent); display: block; text-transform: uppercase; }
-
-input, textarea, select {
-  background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border);
-  color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px;
+/* Stats Animadas */
+.stat-box { 
+  background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 15px; 
+  text-align: center; border: 1px solid rgba(59, 130, 246, 0.2);
+  transition: transform 0.3s ease;
 }
+.stat-box:hover { transform: translateY(-5px); background: rgba(59, 130, 246, 0.2); }
 
-.btn-action {
-  background: var(--primary); color: white; border: none; padding: 15px;
-  border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s;
+input:focus, textarea:focus, select:focus { 
+  outline: 2px solid var(--primary); 
+  background: rgba(15, 23, 42, 0.9);
 }
-
-footer { text-align: center; margin-top: 50px; padding: 30px; border-top: 1px solid var(--border); color: #64748b; font-size: 0.8rem; }
-footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
