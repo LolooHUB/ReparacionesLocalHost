@@ -14,6 +14,8 @@ function App() {
   const [seccion, setSeccion] = useState('A'); 
   const [lista, setLista] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [search, setSearch] = useState(""); // Estado para el buscador
+  const [historialId, setHistorialId] = useState(null); // Para expandir historial
 
   useEffect(() => {
     const q = query(collection(db, "reparaciones"), orderBy("fecha", "desc"));
@@ -27,16 +29,18 @@ function App() {
     window.open(url, '_blank');
   };
 
-  const notificarCliente = (r) => {
-    const msj = `👋 Hola ${r.cliente}, tu ${r.equipo} ya está listo! Total: $${r.precio}.`;
-    window.open(`https://wa.me/${r.telefono.replace(/\D/g, '')}?text=${encodeURIComponent(msj)}`, '_blank');
-  };
-
   const procesarPago = (r) => {
     const met = document.getElementById(`m-${r.fid}`).value;
     if (met === "Tarjeta" || met === "Transferencia") abrirFacturadora(r.precio);
     actualizarReparacion(r.fid, { pagado: true, estado: 'Entregado', metodoPago: met });
   };
+
+  // Filtro de búsqueda para el historial
+  const itemsFiltrados = lista.filter(r => 
+    r.cliente?.toLowerCase().includes(search.toLowerCase()) || 
+    r.equipo?.toLowerCase().includes(search.toLowerCase()) ||
+    r.idTicket?.toString().includes(search)
+  );
 
   return (
     <div className="container">
@@ -58,70 +62,59 @@ function App() {
             alert("Orden registrada"); e.target.reset();
           }}>
             <div className="grid-2">
-              <div className="form-group"><label>Cliente</label><input name="nom" placeholder="Nombre" required /></div>
-              <div className="form-group"><label>WhatsApp</label><input name="tel" placeholder="Número" required /></div>
+              <div className="form-group"><label>Cliente</label><input name="nom" required /></div>
+              <div className="form-group"><label>WhatsApp</label><input name="tel" required /></div>
             </div>
-            <div className="form-group"><label>Equipo</label><input name="dev" placeholder="Modelo" required /></div>
+            <div className="form-group"><label>Equipo</label><input name="dev" required /></div>
             <div className="form-group"><label>Falla</label><textarea name="fall" rows="2" required /></div>
             <button className="btn-action">Guardar Ingreso</button>
           </form>
-          <button onClick={() => abrirFacturadora()} className="btn-factura">Ir a Facturadora ↗</button>
+          <button onClick={() => abrirFacturadora()} className="btn-factura">Abrir Facturadora Externa ↗</button>
         </section>
       )}
 
       {/* SECCIÓN B: TALLER */}
       {seccion === 'B' && (
         <section>
-          <h2>🛠️ Equipos en Taller</h2>
+          <h2>🛠️ Taller</h2>
           {lista.filter(r => r.estado !== 'Terminado' && r.estado !== 'Entregado').length > 0 ? (
             lista.filter(r => r.estado !== 'Terminado' && r.estado !== 'Entregado').map(r => (
               <div key={r.fid} className="card">
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                <div style={{display:'flex', justifyContent:'space-between'}}>
                   <strong>{r.equipo}</strong>
-                  <span className="badge" style={{background: statusMap[r.estado].bg}}>{statusMap[r.estado].icon} {r.estado}</span>
+                  <span className="badge" style={{background: statusMap[r.estado].bg}}>{r.estado}</span>
                 </div>
-                <p style={{fontSize:'0.9rem', color:'#94a3b8', margin:'10px 0'}}>Ticket #{r.idTicket} | {r.cliente}</p>
-                <button className="btn-action" style={{padding:'10px', fontSize:'0.8rem'}} onClick={() => setSelectedId(selectedId === r.fid ? null : r.fid)}>
-                  {selectedId === r.fid ? "Cerrar" : "🔧 Diagnosticar"}
+                <p style={{fontSize:'0.8rem', color:'#94a3b8'}}>#{r.idTicket} | {r.cliente}</p>
+                <button className="btn-action" style={{padding:'8px', marginTop:'10px'}} onClick={() => setSelectedId(selectedId === r.fid ? null : r.fid)}>
+                  {selectedId === r.fid ? "Cerrar" : "🔧 Gestionar"}
                 </button>
                 {selectedId === r.fid && (
                   <div className="details-box">
-                    <div className="form-group"><label>Diagnóstico</label><textarea defaultValue={r.diagnostico} onBlur={(e) => actualizarReparacion(r.fid, { diagnostico: e.target.value })} /></div>
+                    <textarea placeholder="Diagnóstico..." defaultValue={r.diagnostico} onBlur={(e) => actualizarReparacion(r.fid, { diagnostico: e.target.value })} />
                     <div className="grid-2">
-                      <div className="form-group"><label>Precio ($)</label><input type="number" defaultValue={r.precio} onBlur={(e) => actualizarReparacion(r.fid, { precio: Number(e.target.value) })} /></div>
-                      <div className="form-group"><label>Estado</label>
-                        <select value={r.estado} onChange={(e) => actualizarReparacion(r.fid, { estado: e.target.value })}>
-                          <option value="Pendiente">Pendiente</option>
-                          <option value="Proceso">En Reparación</option>
-                          <option value="Terminado">TERMINAR</option>
-                        </select>
-                      </div>
+                      <input type="number" placeholder="Precio" defaultValue={r.precio} onBlur={(e) => actualizarReparacion(r.fid, { precio: Number(e.target.value) })} />
+                      <select value={r.estado} onChange={(e) => actualizarReparacion(r.fid, { estado: e.target.value })}>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Proceso">Proceso</option>
+                        <option value="Terminado">Terminar</option>
+                      </select>
                     </div>
                   </div>
                 )}
               </div>
             ))
-          ) : (
-            <div className="empty-state">
-              <span className="empty-icon">☕</span>
-              <p>No hay equipos para reparar.<br/>¡Momento de un café!</p>
-            </div>
-          )}
+          ) : <div className="empty-state"><span>☕</span><p>Taller vacío</p></div>}
         </section>
       )}
 
       {/* SECCIÓN C: CAJA */}
       {seccion === 'C' && (
         <section>
-          <h2>💰 Pendientes de Cobro</h2>
+          <h2>💰 Caja</h2>
           {lista.filter(r => r.estado === 'Terminado' && !r.pagado).length > 0 ? (
             lista.filter(r => r.estado === 'Terminado' && !r.pagado).map(r => (
               <div key={r.fid} className="card">
-                <div style={{display:'flex', justifyContent:'space-between'}}>
-                  <h3>{r.cliente}</h3>
-                  <h2 style={{color:'#10b981', margin:0}}>${r.precio}</h2>
-                </div>
-                <p>{r.equipo}</p>
+                <h3>{r.cliente} - <span style={{color:'#10b981'}}>${r.precio}</span></h3>
                 <div className="grid-2">
                   <select id={`m-${r.fid}`}>
                     <option value="Efectivo">Efectivo</option>
@@ -130,30 +123,55 @@ function App() {
                   </select>
                   <button className="btn-action" onClick={() => procesarPago(r)}>Cobrar</button>
                 </div>
-                <button className="btn-action btn-wa" onClick={() => notificarCliente(r)}>Avisar por WhatsApp</button>
               </div>
             ))
-          ) : (
-            <div className="empty-state">
-              <span className="empty-icon">✨</span>
-              <p>No hay cobros pendientes.<br/>¡Todo al día!</p>
-            </div>
-          )}
+          ) : <div className="empty-state"><span>✨</span><p>Sin cobros pendientes</p></div>}
         </section>
       )}
 
-      {/* SECCIÓN D: HISTORIAL */}
+      {/* SECCIÓN D: HISTORIAL CON BUSCADOR */}
       {seccion === 'D' && (
         <section>
-          <h2>📚 Historial</h2>
-          {lista.filter(r => r.estado === 'Entregado' || r.estado === 'Terminado').map(r => (
-            <div key={r.fid} className="card" style={{opacity: 0.8}}>
-              <strong>#{r.idTicket} - {r.cliente}</strong>
-              <p style={{margin:'5px 0'}}>{r.equipo} | {r.pagado ? `Pagado (${r.metodoPago})` : 'Sin pagar'}</p>
+          <h2>📚 Historial Completo</h2>
+          <div className="search-container">
+            <span className="search-icon">🔍</span>
+            <input 
+              className="search-input"
+              placeholder="Buscar por cliente, equipo o ticket..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {itemsFiltrados.map(r => (
+            <div key={r.fid} className="card" style={{padding:'15px'}}>
+              <div style={{display:'flex', justifyContent:'space-between', cursor:'pointer'}} onClick={() => setHistorialId(historialId === r.fid ? null : r.fid)}>
+                <span><strong>#{r.idTicket}</strong> {r.cliente}</span>
+                <span style={{fontSize:'0.8rem', color: r.pagado ? '#10b981':'#ef4444'}}>
+                  {r.pagado ? '✅ PAGADO' : '⏳ PENDIENTE'} {historialId === r.fid ? '▲' : '▼'}
+                </span>
+              </div>
+              
+              {historialId === r.fid && (
+                <div className="history-detail">
+                  <p><strong>Dispositivo:</strong> {r.equipo}</p>
+                  <p><strong>Falla inicial:</strong> {r.falla || r.queja}</p>
+                  <p><strong>Diagnóstico técnico:</strong> {r.diagnostico || "Sin datos"}</p>
+                  <p><strong>Total cobrado:</strong> ${r.precio}</p>
+                  {r.pagado && <p><strong>Método:</strong> {r.metodoPago}</p>}
+                  <p style={{fontSize:'0.7rem', color:'#64748b'}}>Fecha: {r.fecha?.toDate ? r.fecha.toDate().toLocaleString() : 'Reciente'}</p>
+                </div>
+              )}
             </div>
           ))}
+          {itemsFiltrados.length === 0 && <p style={{textAlign:'center', color:'#64748b'}}>No se encontraron resultados.</p>}
         </section>
       )}
+
+      <footer>
+        <p>LolooHub 2025 Copyright DERECHOS DE AUTOR</p>
+        <p>Desarrollado por <a href="https://github.com/LolooHUB" target="_blank" rel="noreferrer">LolooHUB</a></p>
+      </footer>
     </div>
   );
 }
