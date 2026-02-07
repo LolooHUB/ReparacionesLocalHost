@@ -1,52 +1,79 @@
+:root {
+  --primary: #2563eb;
+  --dark-blue: #1e3a8a;
+  --accent: #3b82f6;
+  --bg: #0f172a; /* Fondo azul muy oscuro */
+  --card: #1e293b; /* Tarjetas azul grisáceo */
+  --text: #f1f5f9;
+  --input-bg: #334155;
+}
+
 body {
-  background-color: #f4f7f6;
-  color: #333;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
   margin: 0;
 }
 
+.container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+
+/* Barra de navegación moderna */
 nav {
-  background: #2c3e50;
-  padding: 1rem;
-  display: flex;
-  gap: 10px;
+  display: flex; gap: 15px; margin-bottom: 30px;
+  background: var(--card); padding: 12px; border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  justify-content: center;
 }
 
-button {
-  padding: 10px 15px;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-  background: #3498db;
-  color: white;
-  font-weight: bold;
+.nav-btn {
+  padding: 12px 24px; border: none; border-radius: 12px;
+  cursor: pointer; font-weight: 600; transition: 0.3s;
+  background: transparent; color: #94a3b8;
 }
 
-button:hover { background: #2980b9; }
+.nav-btn.active {
+  background: var(--primary); color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+/* Tarjetas */
+.card {
+  background: var(--card); padding: 25px; border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 20px;
+  border: 1px solid #334155;
+}
+
+h2 { color: #60a5fa; border-bottom: 2px solid #334155; padding-bottom: 10px; }
 
 input, textarea, select {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
+  background: var(--input-bg); border: 1px solid #475569;
+  color: white; padding: 12px; border-radius: 10px; margin-top: 8px;
 }
 
-.card {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  margin-bottom: 15px;
+input::placeholder { color: #94a3b8; }
+
+/* Botones */
+.btn-action {
+  background: var(--primary); color: white; border: none;
+  padding: 12px 20px; border-radius: 10px; cursor: pointer;
+  font-weight: bold; transition: 0.2s;
+}
+
+.btn-action:hover { background: var(--accent); transform: scale(1.02); }
+
+.btn-wa { background: #22c55e; margin-left: 10px; } /* Verde WhatsApp */
+
+.btn-factura {
+  background: #f59e0b; width: 100%; margin-top: 20px;
+  display: inline-block; text-align: center; text-decoration: none;
+  color: white; font-weight: bold; padding: 15px; border-radius: 12px;
+}
+
+.details-box {
+  background: #0f172a; padding: 20px; border-radius: 15px;
+  margin-top: 15px; border: 1px solid #2563eb;
 }
 
 .badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  text-transform: uppercase;
+  padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 800;
 }
-
-.pendiente { background: #ffeaa7; }
-.terminado { background: #55efc4; }
