@@ -1,11 +1,16 @@
 :root {
-  --primary: #2563eb;
+  --primary: #60a5fa; /* Azul claro para interactivos */
   --dark-blue: #1e3a8a;
-  --accent: #3b82f6;
+  --accent: #93c5fd; /* Azul más claro para hover */
   --bg: #0f172a; /* Fondo azul muy oscuro */
   --card: #1e293b; /* Tarjetas azul grisáceo */
-  --text: #f1f5f9;
-  --input-bg: #334155;
+  --text: #e2e8f0; /* Texto claro */
+  --input-bg: #334155; /* Fondo de inputs oscuro */
+  --border-color: #475569; /* Bordes */
+  --pending: #dc2626; /* Rojo */
+  --process: #facc15; /* Amarillo */
+  --done: #22c55e; /* Verde */
+  --delivered: #0d9488; /* Verde azulado */
 }
 
 body {
@@ -13,67 +18,110 @@ body {
   color: var(--text);
   font-family: 'Inter', system-ui, sans-serif;
   margin: 0;
+  line-height: 1.6;
 }
 
-.container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+.container { max-width: 1000px; margin: 0 auto; padding: 25px; }
 
-/* Barra de navegación moderna */
+/* Barra de navegación */
 nav {
-  display: flex; gap: 15px; margin-bottom: 30px;
-  background: var(--card); padding: 12px; border-radius: 16px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  display: flex; gap: 15px; margin-bottom: 40px;
+  background: var(--card); padding: 15px; border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
   justify-content: center;
 }
 
 .nav-btn {
-  padding: 12px 24px; border: none; border-radius: 12px;
-  cursor: pointer; font-weight: 600; transition: 0.3s;
+  padding: 14px 28px; border: none; border-radius: 15px;
+  cursor: pointer; font-weight: 700; transition: all 0.3s ease;
   background: transparent; color: #94a3b8;
+  font-size: 1rem;
 }
 
 .nav-btn.active {
   background: var(--primary); color: white;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 15px rgba(96, 165, 250, 0.4);
 }
 
-/* Tarjetas */
+/* Cards (Tarjetas) */
 .card {
-  background: var(--card); padding: 25px; border-radius: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 20px;
-  border: 1px solid #334155;
+  background: var(--card); padding: 25px 30px; border-radius: 20px;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.3); margin-bottom: 25px;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s ease;
+}
+.card:hover { transform: translateY(-3px); }
+
+h2 {
+  color: var(--primary);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 15px;
+  margin-top: 0;
+  font-size: 1.8rem;
+  font-weight: 800;
 }
 
-h2 { color: #60a5fa; border-bottom: 2px solid #334155; padding-bottom: 10px; }
-
+/* Inputs y Textareas */
 input, textarea, select {
-  background: var(--input-bg); border: 1px solid #475569;
-  color: white; padding: 12px; border-radius: 10px; margin-top: 8px;
+  width: 100%; padding: 14px; border: 1px solid var(--border-color);
+  background: var(--input-bg); color: var(--text);
+  border-radius: 12px; margin-top: 10px; font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+  outline: none;
+}
+input::placeholder, textarea::placeholder { color: #94a3b8; }
 
-input::placeholder { color: #94a3b8; }
-
-/* Botones */
+/* Botones de acción */
 .btn-action {
   background: var(--primary); color: white; border: none;
-  padding: 12px 20px; border-radius: 10px; cursor: pointer;
-  font-weight: bold; transition: 0.2s;
+  padding: 14px 25px; border-radius: 12px; cursor: pointer;
+  font-weight: bold; transition: all 0.3s ease;
+  font-size: 1rem;
 }
+.btn-action:hover { background: var(--accent); transform: translateY(-1px); }
 
-.btn-action:hover { background: var(--accent); transform: scale(1.02); }
-
-.btn-wa { background: #22c55e; margin-left: 10px; } /* Verde WhatsApp */
+/* Botones específicos */
+.btn-wa { background: #22c55e; }
+.btn-wa:hover { background: #16a34a; }
 
 .btn-factura {
-  background: #f59e0b; width: 100%; margin-top: 20px;
-  display: inline-block; text-align: center; text-decoration: none;
-  color: white; font-weight: bold; padding: 15px; border-radius: 12px;
+  background: linear-gradient(135deg, #f59e0b, #d97706); /* Gradiente */
+  color: white; text-decoration: none; padding: 18px; border-radius: 15px;
+  text-align: center; font-weight: bold; font-size: 1.1rem;
+  box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4);
+  transition: all 0.3s ease;
+  display: block; /* Asegura que ocupe todo el ancho */
+  margin-top: 25px;
 }
+.btn-factura:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5); }
 
-.details-box {
-  background: #0f172a; padding: 20px; border-radius: 15px;
-  margin-top: 15px; border: 1px solid #2563eb;
-}
-
+/* Badges (Estados) */
 .badge {
-  padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 800;
+  padding: 6px 12px; border-radius: 10px; font-size: 0.8rem;
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+.badge-pending { background-color: var(--pending); color: white; }
+.badge-process { background-color: var(--process); color: var(--card); } /* Texto oscuro para badge amarillo */
+.badge-done { background-color: var(--done); color: white; }
+.badge-delivered { background-color: var(--delivered); color: white; }
+
+/* Detalles expandibles */
+.details-box {
+  background: rgba(0,0,0,0.2); /* Fondo oscuro transparente */
+  padding: 20px; border-radius: 15px; margin-top: 20px;
+  border: 1px solid var(--primary);
+  box-shadow: inset 0 0 10px rgba(96, 165, 250, 0.1);
+}
+.details-box p { margin-bottom: 8px; font-size: 0.95rem; }
+.details-box strong { color: var(--accent); }
+
+/* Otros */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.text-center { text-align: center; }
+.text-muted { color: #94a3b8; font-size: 0.9rem; }

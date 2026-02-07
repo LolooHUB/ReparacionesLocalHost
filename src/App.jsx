@@ -1,50 +1,78 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { registrarEquipo, actualizarReparacion } from './logic';
+
+// Mapeo de estados a estilos de badge y emojis
+const statusMap = {
+  "Pendiente": { text: "Pendiente", class: "badge-pending", emoji: "⏳" },
+  "Proceso": { text: "En Proceso", class: "badge-process", emoji: "🛠️" },
+  "Terminado": { text: "Listo", class: "badge-done", emoji: "✅" },
+  "Entregado": { text: "Entregado", class: "badge-delivered", emoji: "📦" },
+};
 
 function App() {
   const [seccion, setSeccion] = useState('A'); 
   const [lista, setLista] = useState([]);
-  const [filtro, setFiltro] = useState("");
-  const [selectedId, setSelectedId] = useState(null); // Para expandir detalles
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
-    return onSnapshot(collection(db, "reparaciones"), (snapshot) => {
+    const q = query(collection(db, "reparaciones"), orderBy("fecha", "desc"));
+    return onSnapshot(q, (snapshot) => {
       setLista(snapshot.docs.map(d => ({ ...d.data(), fid: d.id })));
     });
   }, []);
 
+  const notificarCliente = (r) => {
+    const msj = `👋 Hola ${r.cliente}, tu ${r.equipo} ya está listo! Costo: $${r.precio}.`;
+    window.open(`https://wa.me/${r.telefono.replace(/\D/g, '')}?text=${encodeURIComponent(msj)}`, '_blank');
+  };
+
+  const procesarPago = (r) => {
+    const met = document.getElementById(`m-${r.fid}`).value;
+    if (met === "Tarjeta" || met === "Transferencia") {
+      window.open("https://facturasonlineweb.web.app/", "_blank");
+    }
+    actualizarReparacion(r.fid, { pagado: true, estado: 'Entregado', metodoPago: met });
+  };
+
   return (
     <div className="container">
       <nav>
-        <button className={`nav-btn ${seccion==='A'?'active':''}`} onClick={() => setSeccion('A')}>Recepción</button>
-        <button className={`nav-btn ${seccion==='B'?'active':''}`} onClick={() => setSeccion('B')}>Técnicos</button>
-        <button className={`nav-btn ${seccion==='C'?'active':''}`} onClick={() => setSeccion('C')}>Caja/Pagos</button>
+        <button className={`nav-btn ${seccion === 'A' ? 'active' : ''}`} onClick={() => setSeccion('A')}>📝 RECEPCIÓN</button>
+        <button className={`nav-btn ${seccion === 'B' ? 'active' : ''}`} onClick={() => setSeccion('B')}>⚙️ TÉCNICOS</button>
+        <button className={`nav-btn ${seccion === 'C' ? 'active' : ''}`} onClick={() => setSeccion('C')}>💰 CAJA</button>
+        <button className={`nav-btn ${seccion === 'D' ? 'active' : ''}`} onClick={() => setSeccion('D')}>📚 HISTORIAL</button>
       </nav>
 
-      {/* SECCIÓN A: REGISTRO */}
+      {/* SECCIÓN A: RECEPCIÓN */}
       {seccion === 'A' && (
         <section>
           <div className="card">
-            <h2>Nuevo Ingreso de Equipo</h2>
+            <h2>📝 Ingreso de Dispositivo</h2>
             <form onSubmit={async (e) => {
               e.preventDefault();
               const d = e.target.elements;
-              const id = await registrarEquipo({
-                nombre: d.nom.value, tel: d.tel.value, dispositivo: d.dev.value, queja: d.fall.value
+              await registrarEquipo({ 
+                nombre: d.nom.value, 
+                tel: d.tel.value, 
+                dispositivo: d.dev.value, 
+                queja: d.fall.value 
               });
-              alert("¡Registrado! Ticket ID: " + id);
+              alert("✅ ¡Orden creada!");
               e.target.reset();
             }}>
-              <div className="grid-form">
-                <input name="nom" placeholder="Nombre del Cliente" required />
-                <input name="tel" placeholder="Teléfono de contacto" required />
+              <div className="grid-2">
+                <input name="nom" placeholder="Cliente" required />
+                <input name="tel" placeholder="WhatsApp" required />
               </div>
-              <input name="dev" placeholder="Dispositivo y Modelo (ej: Motor Trifásico 5HP)" required />
-              <textarea name="fall" placeholder="Falla reportada por el cliente..." rows="3" required />
-              <button className="btn-action" type="submit" style={{width:'100%'}}>Generar Orden de Servicio</button>
+              <input name="dev" placeholder="Equipo" required />
+              <textarea name="fall" placeholder="Falla..." rows="3" required />
+              <button className="btn-action" style={{ width: '100%', marginTop: '20px' }}>REGISTRAR INGRESO</button>
             </form>
+            <a href="https://facturasonlineweb.web.app/" target="_blank" rel="noreferrer" className="btn-factura">
+              FACTURADORA ONLINE ↗
+            </a>
           </div>
         </section>
       )}
@@ -52,44 +80,26 @@ function App() {
       {/* SECCIÓN B: TÉCNICOS */}
       {seccion === 'B' && (
         <section>
-          <h2>Panel de Trabajo Técnico</h2>
-          <input placeholder="Buscar por ID o Cliente..." onChange={(e)=>setFiltro(e.target.value)} />
-          
-          {lista.filter(r => r.idTicket.toString().includes(filtro)).map(r => (
-            <div key={r.fid} className={`card ${r.estado}`}>
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                <div>
-                  <span className="badge" style={{background: '#e2e8f0'}}>#{r.idTicket}</span>
-                  <strong style={{marginLeft: '10px'}}>{r.equipo}</strong>
-                </div>
-                <span className={`badge ${r.estado}`}>{r.estado}</span>
+          <h2>⚙️ Taller</h2>
+          {lista.filter(r => r.estado === 'Pendiente' || r.estado === 'Proceso').map(r => (
+            <div key={r.fid} className="card">
+              <div className="flex-between">
+                <strong>#{r.idTicket} - {r.equipo}</strong>
+                <span className={`badge ${statusMap[r.estado].class}`}>{statusMap[r.estado].text}</span>
               </div>
-
-              <button className="btn-action" onClick={() => setSelectedId(selectedId === r.fid ? null : r.fid)}>
-                {selectedId === r.fid ? "Cerrar Detalles" : "Ver Detalles y Diagnóstico"}
+              <button className="btn-action" style={{ marginTop: '15px' }} onClick={() => setSelectedId(selectedId === r.fid ? null : r.fid)}>
+                {selectedId === r.fid ? "➖ Cerrar" : "➕ Diagnosticar"}
               </button>
-
               {selectedId === r.fid && (
                 <div className="details-box">
-                  <p><strong>Cliente:</strong> {r.cliente} ({r.telefono})</p>
-                  <p><strong>Queja Original:</strong> {r.falla}</p>
-                  <hr />
-                  <label>Diagnóstico Técnico:</label>
-                  <textarea defaultValue={r.diagnostico} onBlur={(e) => actualizarReparacion(r.fid, { diagnostico: e.target.value })} />
-                  
-                  <div className="grid-form">
-                    <div>
-                      <label>Precio Final ($):</label>
-                      <input type="number" defaultValue={r.precio} onBlur={(e) => actualizarReparacion(r.fid, { precio: Number(e.target.value) })} />
-                    </div>
-                    <div>
-                      <label>Cambiar Estado:</label>
-                      <select onChange={(e) => actualizarReparacion(r.fid, { estado: e.target.value })} value={r.estado}>
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="Proceso">En Reparación</option>
-                        <option value="Terminado">Listo para Entrega</option>
-                      </select>
-                    </div>
+                  <textarea defaultValue={r.diagnostico} onBlur={(e) => actualizarReparacion(r.fid, { diagnostico: e.target.value })} placeholder="Escribir diagnóstico..." />
+                  <div className="grid-2">
+                    <input type="number" defaultValue={r.precio} onBlur={(e) => actualizarReparacion(r.fid, { precio: Number(e.target.value) })} placeholder="Precio $" />
+                    <select onChange={(e) => actualizarReparacion(r.fid, { estado: e.target.value })} value={r.estado}>
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="Proceso">En Proceso</option>
+                      <option value="Terminado">MARCAR TERMINADO</option>
+                    </select>
                   </div>
                 </div>
               )}
@@ -98,26 +108,41 @@ function App() {
         </section>
       )}
 
-      {/* SECCIÓN C: PAGOS */}
+      {/* SECCIÓN C: CAJA */}
       {seccion === 'C' && (
         <section>
-          <h2>Equipos Terminados / Pendientes de Cobro</h2>
+          <h2>💰 Caja</h2>
           {lista.filter(r => r.estado === 'Terminado' && !r.pagado).map(r => (
-            <div key={r.fid} className="card Terminado">
-              <h3>Ticket #{r.idTicket} - {r.cliente}</h3>
-              <p>Equipo: {r.equipo} | <strong>Total a Cobrar: ${r.precio}</strong></p>
-              
-              <div className="grid-form">
-                <select id={`pago-${r.fid}`}>
+            <div key={r.fid} className="card">
+              <div className="flex-between">
+                <h3>{r.cliente}</h3>
+                <h3 style={{ color: '#22c55e' }}>${r.precio}</h3>
+              </div>
+              <div className="grid-2">
+                <select id={`m-${r.fid}`}>
                   <option value="Efectivo">Efectivo</option>
                   <option value="Transferencia">Transferencia</option>
-                  <option value="Tarjeta">Tarjeta</option>
+                  <option value="Tarjeta">Tarjeta (Abre Fact.)</option>
                 </select>
-                <button className="btn-action" style={{background: '#10b981'}} onClick={() => {
-                  const metodo = document.getElementById(`pago-${r.fid}`).value;
-                  actualizarReparacion(r.fid, { pagado: true, metodoPago: metodo });
-                }}>Registrar Pago y Entregar</button>
+                <button className="btn-action" onClick={() => procesarPago(r)}>COBRAR</button>
               </div>
+              <button className="btn-action btn-wa" style={{ width: '100%', marginTop: '10px' }} onClick={() => notificarCliente(r)}>Notificar WhatsApp ✅</button>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* SECCIÓN D: HISTORIAL */}
+      {seccion === 'D' && (
+        <section>
+          <h2>📚 Historial</h2>
+          {lista.filter(r => r.estado === 'Terminado' || r.estado === 'Entregado').map(r => (
+            <div key={r.fid} className="card" style={{ opacity: 0.8 }}>
+              <div className="flex-between">
+                <span><strong>#{r.idTicket}</strong> - {r.cliente}</span>
+                <span className={`badge ${statusMap[r.estado].class}`}>{statusMap[r.estado].text}</span>
+              </div>
+              <p style={{ fontSize: '0.9rem' }}>{r.equipo} | {r.pagado ? `Pagado con ${r.metodoPago}` : 'Pendiente'}</p>
             </div>
           ))}
         </section>
