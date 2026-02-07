@@ -3,13 +3,6 @@ import { db } from './firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { registrarEquipo, actualizarReparacion } from './logic';
 
-const statusMap = {
-  "Pendiente": { bg: "#ef4444", icon: "⏳" },
-  "Proceso": { bg: "#3b82f6", icon: "🛠️" },
-  "Terminado": { bg: "#10b981", icon: "✅" },
-  "Entregado": { bg: "#6366f1", icon: "📦" }
-};
-
 function App() {
   const [entrar, setEntrar] = useState(false);
   const [tiempo, setTiempo] = useState(new Date());
@@ -19,11 +12,9 @@ function App() {
   const [search, setSearch] = useState("");
   const [historialId, setHistorialId] = useState(null);
 
-  // ARREGLO DEL RELOJ: Actualización por segundo
+  // Reloj funcionando al segundo
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTiempo(new Date());
-    }, 1000);
+    const timer = setInterval(() => setTiempo(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -34,54 +25,35 @@ function App() {
     });
   }, []);
 
-  const entregados = lista.filter(r => r.pagado);
-  const totalCaja = entregados.reduce((acc, curr) => acc + (curr.precio || 0), 0);
-  const promedio = entregados.length > 0 ? (totalCaja / entregados.length).toFixed(0) : 0;
+  const totalCaja = lista.filter(r => r.pagado).reduce((acc, curr) => acc + (curr.precio || 0), 0);
+  const entregadosCount = lista.filter(r => r.pagado).length;
 
   const procesarPago = (r) => {
     const met = document.getElementById(`m-${r.fid}`).value;
     actualizarReparacion(r.fid, { pagado: true, estado: 'Entregado', metodoPago: met });
   };
 
-  // COMPONENTE PARA MOSTRAR LA BITÁCORA EN TALLER E HISTORIAL
+  // El componente de Bitácora que pediste: Recepcion y Taller
   const Bitacora = ({ r }) => (
     <div className="log-box">
-      <div className="log-sub">
-        <label>📥 Recepción</label>
-        <p><strong>Falla:</strong> {r.falla || r.queja}</p>
-        <p style={{fontSize: '0.7rem'}}>Ingreso: {r.fecha?.toDate ? r.fecha.toDate().toLocaleString() : 'Reciente'}</p>
-      </div>
-      {(r.diagnostico || r.precio) && (
-        <div className="log-sub">
-          <label>🛠️ Taller</label>
-          <p><strong>Trabajo:</strong> {r.diagnostico || 'En revisión'}</p>
-          <p><strong>Costo:</strong> ${r.precio || 0}</p>
-        </div>
-      )}
-      {r.pagado && (
-        <div className="log-sub">
-          <label>💰 Caja</label>
-          <p><strong>Pago:</strong> {r.metodoPago} - ✅ Cobrado</p>
-        </div>
-      )}
+      <div className="log-sub"><label>Recepcion</label><p><strong>Falla:</strong> {r.falla || r.queja}</p></div>
+      {r.diagnostico && <div className="log-sub"><label>Taller</label><p><strong>Trabajo:</strong> {r.diagnostico}</p></div>}
+      {r.pagado && <div className="log-sub"><label>Caja</label><p><strong>Pago:</strong> {r.metodoPago}</p></div>}
     </div>
   );
 
   if (!entrar) {
     return (
-      <div className="welcome-screen">
+      <div className="welcome-screen fade-in-slow">
         <p className="date-display">{tiempo.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-        <h1 className="clock">
-          {tiempo.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-        </h1>
-        <button className="btn-action" style={{ width: '220px', marginTop: '20px' }} onClick={() => setEntrar(true)}>ENTRAR A TRABAJAR</button>
-        <p style={{ marginTop: '40px', fontSize: '0.7rem', color: '#475569' }}>LOLOO HUB • SERVICE OS v2.1</p>
+        <h1 className="clock">{tiempo.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</h1>
+        <button className="btn-action" style={{ width: '220px', marginTop: '20px' }} onClick={() => setEntrar(true)}>Entrar a trabajar</button>
       </div>
     );
   }
 
   return (
-    <div className="container">
+    <div className="container fade-in-slow">
       <nav>
         <button className={`nav-btn ${seccion === 'A' ? 'active' : ''}`} onClick={() => setSeccion('A')}>RECEPCIÓN</button>
         <button className={`nav-btn ${seccion === 'B' ? 'active' : ''}`} onClick={() => setSeccion('B')}>TALLER</button>
@@ -89,7 +61,6 @@ function App() {
         <button className={`nav-btn ${seccion === 'D' ? 'active' : ''}`} onClick={() => setSeccion('D')}>HISTORIAL</button>
       </nav>
 
-      {/* RECEPCIÓN */}
       {seccion === 'A' && (
         <section className="card">
           <h2>📝 Nuevo Ingreso</h2>
@@ -99,42 +70,33 @@ function App() {
             await registrarEquipo({ nombre: d.nom.value, tel: d.tel.value, dispositivo: d.dev.value, queja: d.fall.value });
             alert("Registrado"); e.target.reset();
           }}>
-            <div className="grid-2">
-              <div className="form-group"><label>Cliente</label><input name="nom" required /></div>
-              <div className="form-group"><label>WhatsApp</label><input name="tel" required /></div>
-            </div>
-            <div className="form-group"><label>Equipo</label><input name="dev" required /></div>
-            <div className="form-group"><label>Falla Reportada</label><textarea name="fall" rows="2" required /></div>
-            <button className="btn-action">REGISTRAR ENTRADA</button>
+            <input name="nom" placeholder="Nombre del Cliente" required style={{marginBottom:'10px', width:'100%', padding:'12px', borderRadius:'10px', background:'rgba(0,0,0,0.3)', border:'1px solid var(--border)', color:'white'}} />
+            <input name="tel" placeholder="WhatsApp" required style={{marginBottom:'10px', width:'100%', padding:'12px', borderRadius:'10px', background:'rgba(0,0,0,0.3)', border:'1px solid var(--border)', color:'white'}} />
+            <input name="dev" placeholder="Equipo (Modelo)" required style={{marginBottom:'10px', width:'100%', padding:'12px', borderRadius:'10px', background:'rgba(0,0,0,0.3)', border:'1px solid var(--border)', color:'white'}} />
+            <textarea name="fall" placeholder="Falla reportada" required style={{marginBottom:'15px', width:'100%', padding:'12px', borderRadius:'10px', background:'rgba(0,0,0,0.3)', border:'1px solid var(--border)', color:'white', minHeight:'80px'}} />
+            <button className="btn-action">Guardar en Sistema</button>
           </form>
         </section>
       )}
 
-      {/* TALLER */}
       {seccion === 'B' && (
         <section>
-          <h2>🛠️ Órdenes de Taller</h2>
+          <h2>🛠️ Taller</h2>
           {lista.filter(r => r.estado !== 'Terminado' && r.estado !== 'Entregado').length > 0 ? (
             lista.filter(r => r.estado !== 'Terminado' && r.estado !== 'Entregado').map(r => (
               <div key={r.fid} className="card">
-                <div style={{display:'flex', justifyContent:'space-between'}}>
+                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                   <strong>{r.equipo}</strong>
-                  <span className="badge" style={{background: statusMap[r.estado].bg}}>{statusMap[r.estado].icon} {r.estado}</span>
+                  <span style={{fontSize:'0.7rem', padding:'4px 10px', borderRadius:'20px', background: 'var(--primary)'}}>{r.estado}</span>
                 </div>
-                <p style={{fontSize: '0.8rem', color:'#94a3b8'}}>#{r.idTicket} | {r.cliente}</p>
-                
-                <Bitacora r={r} /> {/* Bitácora siempre visible en Taller */}
-
-                <button className="btn-action" style={{marginTop:'15px'}} onClick={() => setSelectedId(selectedId === r.fid ? null : r.fid)}>
-                  {selectedId === r.fid ? "Cerrar" : "Actualizar Trabajo"}
-                </button>
-
+                <Bitacora r={r} />
+                <button className="btn-action" style={{marginTop:'15px', padding:'10px'}} onClick={() => setSelectedId(selectedId === r.fid ? null : r.fid)}>Actualizar</button>
                 {selectedId === r.fid && (
-                  <div style={{marginTop:'15px', padding:'10px', background:'rgba(255,255,255,0.05)', borderRadius:'10px'}}>
-                    <textarea placeholder="¿Qué se le hizo?" defaultValue={r.diagnostico} onBlur={(e) => actualizarReparacion(r.fid, { diagnostico: e.target.value })} />
-                    <div className="grid-2" style={{marginTop:'10px'}}>
-                      <input type="number" placeholder="Precio ($)" defaultValue={r.precio} onBlur={(e) => actualizarReparacion(r.fid, { precio: Number(e.target.value) })} />
-                      <select value={r.estado} onChange={(e) => actualizarReparacion(r.fid, { estado: e.target.value })}>
+                  <div style={{marginTop:'15px'}}>
+                    <textarea placeholder="¿Qué trabajo se hizo?" defaultValue={r.diagnostico} onBlur={(e) => actualizarReparacion(r.fid, { diagnostico: e.target.value })} style={{width:'100%', background:'rgba(0,0,0,0.3)', color:'white', padding:'10px', borderRadius:'10px'}} />
+                    <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginTop:'10px'}}>
+                      <input type="number" placeholder="Precio ($)" defaultValue={r.precio} onBlur={(e) => actualizarReparacion(r.fid, { precio: Number(e.target.value) })} style={{background:'rgba(0,0,0,0.3)', color:'white', padding:'10px', borderRadius:'10px'}} />
+                      <select value={r.estado} onChange={(e) => actualizarReparacion(r.fid, { estado: e.target.value })} style={{background:'rgba(0,0,0,0.3)', color:'white', padding:'10px', borderRadius:'10px'}}>
                         <option value="Pendiente">Pendiente</option>
                         <option value="Proceso">Proceso</option>
                         <option value="Terminado">Terminar</option>
@@ -144,11 +106,10 @@ function App() {
                 )}
               </div>
             ))
-          ) : <div className="empty-state"><span>☕</span><p>Taller limpio</p></div>}
+          ) : <div className="empty-state"><span className="empty-icon">☕</span><p>No hay trabajos pendientes</p></div>}
         </section>
       )}
 
-      {/* CAJA */}
       {seccion === 'C' && (
         <section>
           <h2>💰 Caja</h2>
@@ -156,35 +117,37 @@ function App() {
             <div key={r.fid} className="card">
               <div style={{display:'flex', justifyContent:'space-between'}}>
                 <h3>{r.cliente}</h3>
-                <h2 style={{color:'#10b981'}}>${r.precio}</h2>
+                <h3 style={{color:'#10b981'}}>${r.precio}</h3>
               </div>
-              <p>{r.equipo}</p>
-              <div className="grid-2">
-                <select id={`m-${r.fid}`}><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta">Tarjeta</option></select>
-                <button className="btn-action" onClick={() => procesarPago(r)}>COBRAR</button>
+              <p style={{fontSize:'0.8rem', opacity:0.7}}>{r.equipo}</p>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginTop:'10px'}}>
+                <select id={`m-${r.fid}`} style={{background:'rgba(0,0,0,0.3)', color:'white', padding:'10px', borderRadius:'10px'}}>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Transferencia">Transferencia</option>
+                  <option value="Tarjeta">Tarjeta</option>
+                </select>
+                <button className="btn-action" style={{padding:'10px'}} onClick={() => procesarPago(r)}>Cobrar</button>
               </div>
             </div>
           ))}
-          <div className="stats-footer">
-            <div className="stat-box"><small>TOTAL CAJA</small><strong>${totalCaja}</strong></div>
-            <div className="stat-box"><small>EQUIPOS</small><strong>{entregados.length}</strong></div>
-            <div className="stat-box"><small>PROM.</small><strong>${promedio}</strong></div>
+          <div className="stats-grid">
+            <div className="stat-box"><small>RECAUDADO</small><strong>${totalCaja}</strong></div>
+            <div className="stat-box"><small>ENTREGADOS</small><strong>{entregadosCount}</strong></div>
           </div>
         </section>
       )}
 
-      {/* HISTORIAL */}
       {seccion === 'D' && (
         <section>
           <h2>📚 Historial</h2>
-          <input className="card" style={{width:'100%', marginBottom:'15px'}} placeholder="🔍 Buscar ticket, cliente o equipo..." onChange={(e) => setSearch(e.target.value)} />
-          {lista.filter(r => r.cliente?.toLowerCase().includes(search.toLowerCase()) || r.equipo?.toLowerCase().includes(search.toLowerCase())).map(r => (
-            <div key={r.fid} className="card" style={{cursor:'pointer'}} onClick={() => setHistorialId(historialId === r.fid ? null : r.fid)}>
+          <input className="card" style={{width:'100%', padding:'15px', marginBottom:'20px', boxSizing:'border-box'}} placeholder="🔍 Buscar cliente, equipo o ticket..." onChange={(e) => setSearch(e.target.value)} />
+          {lista.filter(r => r.cliente?.toLowerCase().includes(search.toLowerCase()) || r.equipo?.toLowerCase().includes(search.toLowerCase()) || r.idTicket?.toString().includes(search)).map(r => (
+            <div key={r.fid} className="card" onClick={() => setHistorialId(historialId === r.fid ? null : r.fid)} style={{cursor:'pointer'}}>
               <div style={{display:'flex', justifyContent:'space-between'}}>
-                <span><strong>#{r.idTicket}</strong> {r.cliente}</span>
-                <span className={`badge ${r.pagado ? 'pagado' : ''}`}>{r.pagado ? '✅ ENTREGADO' : '⏳ EN TALLER'}</span>
+                <strong>#{r.idTicket} - {r.cliente}</strong>
+                <span style={{fontSize:'0.7rem', color: r.pagado ? '#10b981' : '#94a3b8'}}>{r.pagado ? 'COBRADO' : 'PENDIENTE'}</span>
               </div>
-              <p style={{margin: '5px 0', fontSize:'0.8rem'}}>{r.equipo}</p>
+              <p style={{fontSize:'0.8rem', opacity:0.6}}>{r.equipo}</p>
               {historialId === r.fid && <Bitacora r={r} />}
             </div>
           ))}
