@@ -19,7 +19,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- ANIMACIONES NUEVAS --- */
+/* Animaciones */
 .fade-in-inicio { animation: fadeIn 1s ease-out forwards; }
 .fade-in-sistema { animation: fadeIn 2.5s ease-out forwards; }
 
@@ -28,7 +28,7 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- PANTALLA DE INICIO --- */
+/* Pantalla de Inicio */
 .welcome-screen {
   height: 100vh; display: flex; flex-direction: column;
   align-items: center; justify-content: center; text-align: center;
@@ -36,7 +36,6 @@ body {
 .clock { font-size: 5rem; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(59, 130, 246, 0.4); margin: 10px 0; }
 .date-display { font-size: 1.2rem; color: var(--accent); margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
 
-/* --- CONTENEDOR Y NAV --- */
 .container { max-width: 800px; margin: 0 auto; padding: 20px; }
 
 nav {
@@ -48,50 +47,42 @@ nav {
 
 .nav-btn {
   flex: 1; padding: 12px; border: none; border-radius: 12px;
-  background: transparent; color: #94a3b8; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 0.8rem;
+  background: transparent; color: #94a3b8; font-weight: 600; cursor: pointer; transition: 0.3s;
 }
 .nav-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
 
-/* --- TARJETAS Y FORMULARIOS (TU DISEÑO) --- */
 .card {
   background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border);
   padding: 25px; border-radius: 24px; margin-bottom: 20px;
 }
 
-h2 { color: var(--accent); margin-top: 0; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
-.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-.form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
-label { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin-left: 4px; }
-
-input, textarea, select {
-  background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border);
-  color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; font-size: 1rem;
-}
-input:focus, textarea:focus { outline: 1px solid var(--primary); }
-
-.btn-action {
-  background: var(--primary); color: white; border: none; padding: 15px;
-  border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s;
-}
-.btn-action:hover { background: #2563eb; transform: scale(1.02); }
-
-/* --- BITÁCORA E HISTORIAL (NUEVO INTEGRADO) --- */
-.log-box { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 18px; border-left: 4px solid var(--primary); }
-.log-sub { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.log-sub:last-child { border: none; margin-bottom: 0; }
-.log-sub label { font-size: 0.65rem; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 2px; }
-.log-sub p { margin: 0; font-size: 0.9rem; color: #cbd5e1; }
-
-/* --- ESTADÍSTICAS --- */
-.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 30px; }
-.stat-box { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(59, 130, 246, 0.2); }
-.stat-box small { font-size: 0.6rem; color: var(--accent); display: block; }
-
+/* Estados vacíos (El café) */
 .empty-state {
   text-align: center; padding: 50px 20px; background: rgba(30, 41, 59, 0.3);
   border: 2px dashed rgba(255, 255, 255, 0.05); border-radius: 24px; color: #64748b;
 }
 .empty-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+
+/* Bitácora */
+.log-box { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 18px; border-left: 4px solid var(--primary); }
+.log-sub { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.log-sub label { font-size: 0.65rem; text-transform: uppercase; color: var(--accent); display: block; font-weight: 800; }
+.log-sub p { margin: 0; font-size: 0.9rem; color: #cbd5e1; }
+
+/* Estadísticas en Caja */
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 30px; }
+.stat-box { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(59, 130, 246, 0.2); }
+.stat-box small { font-size: 0.6rem; color: var(--accent); display: block; text-transform: uppercase; }
+
+input, textarea, select {
+  background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border);
+  color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px;
+}
+
+.btn-action {
+  background: var(--primary); color: white; border: none; padding: 15px;
+  border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s;
+}
 
 footer { text-align: center; margin-top: 50px; padding: 30px; border-top: 1px solid var(--border); color: #64748b; font-size: 0.8rem; }
 footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
