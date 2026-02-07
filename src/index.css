@@ -14,9 +14,10 @@ body {
   margin: 0; padding: 0; min-height: 100vh;
   background-color: var(--bg);
   background-image: 
+    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 80%),
     linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
-  background-size: 30px 30px;
+  background-size: 100% 100%, 30px 30px, 30px 30px;
   color: var(--text);
   font-family: 'Inter', system-ui, sans-serif;
 }
@@ -28,7 +29,7 @@ nav {
   position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
   width: 95%; max-width: 500px;
   display: flex; gap: 8px; padding: 8px;
-  background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(15px);
   border: 1px solid var(--border); border-radius: 20px; z-index: 1000;
 }
 
@@ -38,11 +39,11 @@ nav {
 }
 .nav-btn.active { background: var(--primary); color: white; }
 
-/* Cards y Animaciones */
+/* Cards */
 .card {
   background: var(--card-bg); backdrop-filter: blur(16px);
-  border: 1px solid var(--border); padding: 20px; border-radius: 24px;
-  margin-bottom: 15px; animation: slideUp 0.5s ease-out forwards;
+  border: 1px solid var(--border); padding: 25px; border-radius: 24px;
+  margin-bottom: 20px; animation: slideUp 0.5s ease-out forwards;
 }
 
 @keyframes slideUp {
@@ -50,46 +51,54 @@ nav {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Botones con Feedback Visual */
 .btn-action {
   width: 100%; background: var(--primary); color: white;
   border: none; padding: 16px; border-radius: 16px;
   font-weight: 800; cursor: pointer; transition: 0.3s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.btn-action:active { transform: scale(0.95); }
-.btn-action:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+.btn-action:active { transform: scale(0.96); }
 
-.btn-ready {
-  background: var(--success);
-  animation: pulseSuccess 2s infinite;
+.btn-ready { 
+  background: var(--success) !important; 
+  animation: pulseSuccess 2s infinite; 
 }
 
 @keyframes pulseSuccess {
   0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  70% { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
   100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-/* Inputs */
+/* Bitácora / Detalles */
+.log-box { 
+  margin-top: 15px; padding: 20px; 
+  background: rgba(0,0,0,0.3); border-radius: 20px;
+  border-left: 4px solid var(--primary);
+}
+
+.log-sub { margin-bottom: 12px; }
+.log-sub label { font-size: 0.7rem; text-transform: uppercase; color: var(--accent); font-weight: 900; }
+.log-sub p { margin: 4px 0 0 0; font-size: 0.9rem; }
+
+.item-row {
+  display: flex; justify-content: space-between; padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem;
+}
+
 input, textarea, select {
   width: 100%; background: rgba(15, 23, 42, 0.6);
   border: 1px solid var(--border); color: white; padding: 14px;
   border-radius: 14px; font-size: 1rem; margin-bottom: 12px;
 }
 
-/* Detalles de Taller */
-.tech-detail {
-  background: rgba(0,0,0,0.3); padding: 15px; border-radius: 18px;
-  border: 1px solid var(--primary); margin-top: 10px;
-}
-
-.item-row {
-  display: flex; justify-content: space-between; padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;
-}
-
 .welcome-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.clock { font-size: 5rem; font-weight: 900; margin: 0; color: white; }
+.clock { font-size: 5.5rem; font-weight: 900; margin: 0; color: white; }
 
-footer { text-align: center; margin-top: 40px; opacity: 0.4; font-size: 0.7rem; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+.stat-box { 
+  background: rgba(59, 130, 246, 0.1); padding: 18px; border-radius: 20px; 
+  text-align: center; border: 1px solid var(--border);
+}
+
+footer { text-align: center; margin-top: 50px; opacity: 0.4; font-size: 0.8rem; }
