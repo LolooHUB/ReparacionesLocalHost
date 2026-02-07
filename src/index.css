@@ -1,127 +1,107 @@
 :root {
-  --primary: #60a5fa; /* Azul claro para interactivos */
-  --dark-blue: #1e3a8a;
-  --accent: #93c5fd; /* Azul más claro para hover */
-  --bg: #0f172a; /* Fondo azul muy oscuro */
-  --card: #1e293b; /* Tarjetas azul grisáceo */
-  --text: #e2e8f0; /* Texto claro */
-  --input-bg: #334155; /* Fondo de inputs oscuro */
-  --border-color: #475569; /* Bordes */
-  --pending: #dc2626; /* Rojo */
-  --process: #facc15; /* Amarillo */
-  --done: #22c55e; /* Verde */
-  --delivered: #0d9488; /* Verde azulado */
+  --primary: #3b82f6;
+  --accent: #60a5fa;
+  --bg: #0b1120;
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --text: #f1f5f9;
+  --border: rgba(255, 255, 255, 0.1);
 }
 
 body {
-  background-color: var(--bg);
+  background: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%);
+  background-attachment: fixed;
   color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', sans-serif;
   margin: 0;
-  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-.container { max-width: 1000px; margin: 0 auto; padding: 25px; }
+/* Efecto de textura de fondo */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: -1;
+}
 
-/* Barra de navegación */
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
 nav {
-  display: flex; gap: 15px; margin-bottom: 40px;
-  background: var(--card); padding: 15px; border-radius: 20px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-  justify-content: center;
+  display: flex; gap: 10px; margin-bottom: 30px;
+  background: rgba(15, 23, 42, 0.8);
+  padding: 10px; border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  position: sticky; top: 10px; z-index: 100;
 }
 
 .nav-btn {
-  padding: 14px 28px; border: none; border-radius: 15px;
-  cursor: pointer; font-weight: 700; transition: all 0.3s ease;
+  flex: 1; padding: 12px; border: none; border-radius: 12px;
   background: transparent; color: #94a3b8;
-  font-size: 1rem;
+  font-weight: 600; cursor: pointer; transition: 0.3s;
 }
 
 .nav-btn.active {
   background: var(--primary); color: white;
-  box-shadow: 0 6px 15px rgba(96, 165, 250, 0.4);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
-/* Cards (Tarjetas) */
 .card {
-  background: var(--card); padding: 25px 30px; border-radius: 20px;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.3); margin-bottom: 25px;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s ease;
-}
-.card:hover { transform: translateY(-3px); }
-
-h2 {
-  color: var(--primary);
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: 15px;
-  margin-top: 0;
-  font-size: 1.8rem;
-  font-weight: 800;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  padding: 25px; border-radius: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* Inputs y Textareas */
+h2 { color: var(--accent); margin-top: 0; font-size: 1.5rem; }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+
+label { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-left: 5px; }
+
 input, textarea, select {
-  width: 100%; padding: 14px; border: 1px solid var(--border-color);
-  background: var(--input-bg); color: var(--text);
-  border-radius: 12px; margin-top: 10px; font-size: 1rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border);
+  color: white; padding: 12px; border-radius: 12px;
+  width: 100%; box-sizing: border-box;
 }
-input:focus, textarea:focus, select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
-  outline: none;
-}
-input::placeholder, textarea::placeholder { color: #94a3b8; }
 
-/* Botones de acción */
 .btn-action {
   background: var(--primary); color: white; border: none;
-  padding: 14px 25px; border-radius: 12px; cursor: pointer;
-  font-weight: bold; transition: all 0.3s ease;
-  font-size: 1rem;
+  padding: 15px; border-radius: 14px; font-weight: 700;
+  cursor: pointer; width: 100%; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn-action:hover { background: var(--accent); transform: translateY(-1px); }
 
-/* Botones específicos */
-.btn-wa { background: #22c55e; }
-.btn-wa:hover { background: #16a34a; }
+.btn-action:hover { background: var(--accent); transform: translateY(-2px); }
+
+.btn-wa { background: #22c55e; margin-top: 10px; }
 
 .btn-factura {
-  background: linear-gradient(135deg, #f59e0b, #d97706); /* Gradiente */
-  color: white; text-decoration: none; padding: 18px; border-radius: 15px;
-  text-align: center; font-weight: bold; font-size: 1.1rem;
-  box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4);
-  transition: all 0.3s ease;
-  display: block; /* Asegura que ocupe todo el ancho */
-  margin-top: 25px;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  text-decoration: none; color: white; font-weight: bold;
+  padding: 15px; border-radius: 15px; display: block;
+  text-align: center; margin-top: 10px;
 }
-.btn-factura:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5); }
 
-/* Badges (Estados) */
 .badge {
-  padding: 6px 12px; border-radius: 10px; font-size: 0.8rem;
-  font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px;
+  padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;
 }
-.badge-pending { background-color: var(--pending); color: white; }
-.badge-process { background-color: var(--process); color: var(--card); } /* Texto oscuro para badge amarillo */
-.badge-done { background-color: var(--done); color: white; }
-.badge-delivered { background-color: var(--delivered); color: white; }
 
-/* Detalles expandibles */
 .details-box {
-  background: rgba(0,0,0,0.2); /* Fondo oscuro transparente */
-  padding: 20px; border-radius: 15px; margin-top: 20px;
-  border: 1px solid var(--primary);
-  box-shadow: inset 0 0 10px rgba(96, 165, 250, 0.1);
+  background: rgba(0,0,0,0.2); padding: 20px;
+  border-radius: 18px; margin-top: 15px; border: 1px solid rgba(59, 130, 246, 0.2);
 }
-.details-box p { margin-bottom: 8px; font-size: 0.95rem; }
-.details-box strong { color: var(--accent); }
-
-/* Otros */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.flex-between { display: flex; justify-content: space-between; align-items: center; }
-.text-center { text-align: center; }
-.text-muted { color: #94a3b8; font-size: 0.9rem; }
